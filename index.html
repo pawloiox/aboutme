@@ -15,6 +15,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* Preloader */
+        #preloader {
+            transition: opacity 0.8s ease-out; /* For the final fade */
+        }
+        .preloader-text {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
         /* Custom Base Settings */
         :root {
             --cursor-size: 20px;
@@ -142,6 +151,13 @@
     </style>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-black">
+
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 z-[100] bg-[#030305] flex items-center justify-center">
+        <div class="preloader-text text-3xl font-bold tracking-tight font-header" data-cursor="active">
+            PAWLOIOX<span class="text-cyan-400">.</span>
+        </div>
+    </div>
 
     <!-- Noise Overlay -->
     <div class="noise"></div>
@@ -504,16 +520,55 @@
 
         // GSAP Animations
         
-        // Hero Text Reveal
-        const tl = gsap.timeline();
-        tl.from('.hero-anim', {
-            y: 50,
-            opacity: 0,
+        // --- PRELOADER ANIMATION ---
+        const preloaderTl = gsap.timeline();
+        
+        preloaderTl.to('.preloader-text', {
+            opacity: 1,
+            scale: 1,
             duration: 1.2,
-            stagger: 0.2,
-            ease: 'power4.out',
-            delay: 0.2
+            ease: 'power3.out'
+        })
+        .to('.preloader-text', {
+            delay: 0.5,
+            opacity: 0,
+            y: -20,
+            duration: 0.8,
+            ease: 'power2.in'
+        })
+        .to('#preloader', {
+            opacity: 0,
+            duration: 1,
+            ease: 'power3.out',
+            onComplete: () => {
+                // Hide preloader completely
+                document.getElementById('preloader').style.display = 'none';
+                
+                // --- TRIGGER HERO ANIMATION ---
+                // (This was the original timeline)
+                gsap.from('.hero-anim', {
+                    y: 50,
+                    opacity: 0,
+                    duration: 1.2,
+                    stagger: 0.2,
+                    ease: 'power4.out',
+                    delay: 0.2 // A slight delay after preloader fades
+                });
+            }
         });
+
+
+        // --- ORIGINAL HERO ANIMATION (NOW MOVED) ---
+        // const tl = gsap.timeline();
+        // tl.from('.hero-anim', {
+        //     y: 50,
+        //     opacity: 0,
+        //     duration: 1.2,
+        //     stagger: 0.2,
+        //     ease: 'power4.out',
+        //     delay: 0.2
+        // });
+        // (This is now triggered in the preloader's onComplete)
 
         // Scroll Animations
         
