@@ -24,6 +24,11 @@
             transform: scale(0.95);
         }
 
+        /* Set initial state for hero animations to prevent flash */
+        .hero-anim {
+            opacity: 0;
+        }
+
         /* Custom Base Settings */
         :root {
             --cursor-size: 20px;
@@ -524,12 +529,6 @@
         const preloaderTl = gsap.timeline();
         
         preloaderTl.to('.preloader-text', {
-            opacity: 1,
-            scale: 1,
-            duration: 1.2,
-            ease: 'power3.out'
-        })
-        .to('.preloader-text', {
             delay: 0.5,
             opacity: 0,
             y: -20,
@@ -546,14 +545,18 @@
                 
                 // --- TRIGGER HERO ANIMATION ---
                 // (This was the original timeline)
-                gsap.from('.hero-anim', {
-                    y: 50,
-                    opacity: 0,
-                    duration: 1.2,
-                    stagger: 0.2,
-                    ease: 'power4.out',
-                    delay: 0.2 // A slight delay after preloader fades
-                });
+                // FIX: Was gsap.from(), which conflicts with CSS opacity:0
+                gsap.fromTo('.hero-anim', 
+                    { y: 50, opacity: 0 }, // from state
+                    {
+                        y: 0,
+                        opacity: 1, // to state
+                        duration: 1.2,
+                        stagger: 0.2,
+                        ease: 'power4.out',
+                        delay: 0.2 // A slight delay after preloader fades
+                    }
+                );
             }
         });
 
