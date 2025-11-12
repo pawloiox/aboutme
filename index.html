@@ -191,7 +191,7 @@
 
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-screen">
-        <div class="text-2xl font-bold tracking-tight font-header hover-trigger" data-cursor="active">
+        <div id="nav-logo" class="text-2xl font-bold tracking-tight font-header hover-trigger" data-cursor="active">
             PAWLOIOX<span class="text-cyan-400">.</span>
         </div>
         <div class="hidden md:flex gap-8 text-sm font-medium tracking-widest text-gray-400">
@@ -558,6 +558,19 @@
                     }
                 );
             }
+        });
+
+        // --- HIDE NAV LOGO ON SCROLL ---
+        gsap.to("#nav-logo", {
+            scrollTrigger: {
+                trigger: "body",
+                start: "10 top", // Start fading 10px from the top
+                end: "100 top",  // Fully faded by 100px scrolled
+                scrub: 0.5,      // Smoothly scrub the animation
+            },
+            opacity: 0,
+            y: -10, // Move up slightly as it fades
+            ease: "power2.out"
         });
 
 
