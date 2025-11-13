@@ -168,9 +168,17 @@
 </head>
 <body class="antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
 
-    <!-- PRELOADER OVERLAY --><div id="preloader" class="fixed inset-0 z-[100] bg-black flex items-center justify-center">
-        <div class="preloader-text text-4xl md:text-6xl font-bold tracking-tighter opacity-0">
-            PAWLOIOX<span class="text-cyan-400">.</span>
+    <!-- PRELOADER OVERLAY -->
+    <!-- Modified this section -->
+    <div id="preloader" class="fixed inset-0 z-[100] bg-black flex items-center justify-center cursor-pointer">
+        <div class="text-center"> <!-- Wrapper for centering -->
+            <div class="preloader-text text-4xl md:text-6xl font-bold tracking-tighter opacity-0">
+                PAWLOIOX<span class="text-cyan-400">.</span>
+            </div>
+            <!-- NEW ELEMENT -->
+            <div class="preloader-prompt text-lg text-gray-400 font-light tracking-widest opacity-0 mt-4">
+                Click to continue.
+            </div>
         </div>
     </div>
 
@@ -584,48 +592,73 @@
 
 
         // 4. GSAP ANIMATION SEQUENCE
-        
-        const tl = gsap.timeline();
+        // --- Modified this entire section ---
 
-        // --- PHASE 1: PRELOADER ---
-        tl.to(".preloader-text", {
+        // --- PHASE 1: PRELOADER FADE-IN ---
+        const preloader = document.getElementById('preloader');
+        const preloaderTl = gsap.timeline();
+
+        preloaderTl.to(".preloader-text", {
             duration: 1,
             opacity: 1,
             ease: "power2.out"
         })
-        .to(".preloader-text", {
-            duration: 0.5,
-            opacity: 1 
-        })
-        .to(".preloader-text", {
-            duration: 0.5,
-            opacity: 0,
-            ease: "power2.in"
-        })
-        .to("#preloader", {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        })
-        .set("#preloader", { display: "none" })
+        .to(".preloader-prompt", { // Fade in the new prompt
+            duration: 1,
+            opacity: 1,
+            delay: 0.5, // Wait half a second after logo
+            ease: "power2.out"
+        });
 
-        // --- PHASE 2: MAIN CONTENT REVEAL ---
-        .fromTo("#nav-logo", 
-            { opacity: 0, y: -20 },
-            { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
-            "-=0.4" 
-        )
-        .fromTo(".hero-anim", 
-            { y: 50, opacity: 0 }, 
-            { 
-                y: 0, 
-                opacity: 1, 
-                duration: 1.2, 
-                stagger: 0.15, 
-                ease: "power4.out" 
-            },
-            "-=0.8" 
-        );
+        // --- PHASE 2: MAIN CONTENT REVEAL (Function) ---
+        function startMainAnimation() {
+            const mainTl = gsap.timeline();
+            mainTl.fromTo("#nav-logo", 
+                { opacity: 0, y: -20 },
+                { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
+                "-=0.4" // Start this slightly after preloader fade
+            )
+            .fromTo(".hero-anim", 
+                { y: 50, opacity: 0 }, 
+                { 
+                    y: 0, 
+                    opacity: 1, 
+                    duration: 1.2, 
+                    stagger: 0.15, 
+                    ease: "power4.out" 
+                },
+                "-=0.8" 
+            );
+        }
+
+        // --- PRELOADER CLICK HANDLER ---
+        function continueToSite() {
+            // Prevent multiple clicks
+            preloader.removeEventListener('click', continueToSite);
+            preloader.removeEventListener('touchend', continueToSite); // Add touch support
+
+            // Fade out preloader content first
+            gsap.to([".preloader-text", ".preloader-prompt"], {
+                duration: 0.5,
+                opacity: 0,
+                ease: "power2.in"
+            });
+
+            // Fade out preloader background
+            gsap.to(preloader, {
+                duration: 0.8,
+                opacity: 0,
+                delay: 0.3, // Wait for text to start fading
+                ease: "power2.inOut",
+                onComplete: () => {
+                    preloader.style.display = "none";
+                    startMainAnimation(); // Start main site animations
+                }
+            });
+        }
+        
+        preloader.addEventListener('click', continueToSite);
+        preloader.addEventListener('touchend', continueToSite); // Add touch support
 
 
         // 5. Scroll Animations (Reveal on Scroll)
